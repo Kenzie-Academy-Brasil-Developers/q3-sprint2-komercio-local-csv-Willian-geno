@@ -11,20 +11,23 @@ from app.products import (
     write_products_in_csv, 
     rewrite_products_in_csv,
     validate_id)
+
+    
 app = Flask(__name__)
 
 
 @app.get("/products")
-def get_products():
-    print("1")
-    products = read_products_specific_from_csv(1, 3)
+def get_products_page():
+    page = request.args.get("page")
+    per_page = request.args.get("per_page")
+
+    if page == None or per_page == None:
+        products = read_products_specific_from_csv(1, 3)
+        return jsonify(products), 200
+
+    products = read_products_specific_from_csv(int(page), int(per_page))
     return jsonify(products), 200
 
-@app.get("/products/page=<int:page>&per_page=<int:per_page>")
-def get_products_page(page:int, per_page:int):
-    print("2")
-    products = read_products_specific_from_csv(page, per_page)
-    return jsonify(products), 200
 
 @app.get("/products/<int:product_id>")
 def get_products_id(product_id):
