@@ -62,6 +62,8 @@ def write_products_in_csv(payload:dict):
     with open(file, "a") as csv_file:
         id_value = len(read_products_from_csv()) + 1
 
+        print(id_value)
+
         payload["id"] = id_value
         fieldnames=["id", "name", "price"]
 

@@ -41,7 +41,7 @@ def get_products_id(product_id):
 def create_product():
     expected_keys = {"name", "price"}    
     data = request.get_json()
-
+    print(data)
     try:
         validate_keys(data, expected_keys)
     except KeyError as e:
@@ -55,21 +55,25 @@ def create_product():
 
 @app.patch("/products/<int:product_id>")
 def patch(product_id:int):
-    expected_keys = {"name"}    
-    data = request.get_json()
-
     is_id = validate_id(product_id)
     if is_id != True: 
         return {"error": f"product id {product_id} not found"}, HTTPStatus.NOT_FOUND
 
     data = request.get_json()
     products = read_products_from_csv()
-
-    for product in products:
-        if product["id"] == product_id:
-            product["name"] = data["name"]
+    
+    if "price" in data:
+        for product in products:
+            if product["id"] == product_id:
+                product["price"] = data["price"]
             result = product
-    rewrite_products_in_csv(products)
+
+    if "name" in data:
+        for product in products:
+            if product["id"] == product_id:
+                product["name"] = data["name"]
+            result = product
+        rewrite_products_in_csv(products)
 
     return jsonify(result), 200   
 
