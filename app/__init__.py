@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from itertools import product
 import re
+from unittest import result
 from xxlimited import new
 from flask import Flask, jsonify, request
 
@@ -26,16 +27,20 @@ def get_products_page():
         return jsonify(products), 200
 
     products = read_products_specific_from_csv(int(page), int(per_page))
-    return jsonify(products), 200
+    return jsonify(products), HTTPStatus.OK
 
 
 @app.get("/products/<int:product_id>")
 def get_products_id(product_id):
     products = read_products_from_csv()
+    result = ""
     for product in products:
         print(type(product["id"]))
         if product["id"] == product_id:
-            return jsonify(product), 200 
+            result = product
+
+    return jsonify(result), HTTPStatus.OK
+    
 
 @app.post("/products")
 def create_product():
@@ -66,7 +71,6 @@ def patch(product_id:int):
         for product in products:
             if product["id"] == product_id:
                 product["price"] = data["price"]
-            result = product
 
     if "name" in data:
         for product in products:
@@ -75,7 +79,7 @@ def patch(product_id:int):
             result = product
         rewrite_products_in_csv(products)
 
-    return jsonify(result), 200   
+    return jsonify(products[product_id-1]), HTTPStatus.OK   
 
 @app.delete("/products/<int:product_id>")
 def delet_product(product_id):
